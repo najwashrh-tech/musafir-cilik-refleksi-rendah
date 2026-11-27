@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ikrar Musafir Cilik - Pendidikan Islam Tahun 5</title>
+    <!-- Tailwind CSS untuk susun atur responsif dan moden -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tone.js untuk kesan bunyi dan muzik latar lembut -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Google Fonts: Fredoka & Nunito untuk tulisan mesra kanak-kanak yang jelas -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Konfigurasi Fon Utama */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #E0F7FA 0%, #FFF9C4 50%, #F8BBD0 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        h1, h2, .font-display {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Animasi Terapung untuk Awan dan Elemen Hiasan */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+            animation: float 5s ease-in-out 1.5s infinite;
+        }
+
+        /* Animasi Denyutan Lembut untuk Butang Utama */
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-pulse-soft {
+            animation: pulse-soft 2.5s infinite;
+        }
+
+        /* Sorotan Baris Ikrar Semasa Dibaca */
+        .pledge-line {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 1rem;
+            padding: 0.5rem 0.75rem;
+        }
+        .pledge-line.active-reading {
+            background-color: #FEF08A; /* Kuning lembut */
+            transform: scale(1.02) translateX(6px);
+            box-shadow: 0 4px 12px rgba(250, 204, 21, 0.4);
+            color: #1E293B;
+        }
+
+        /* Gaya Butang 3D Mesra Kanak-Kanak */
+        .btn-3d {
+            transition: all 0.15s ease;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.15);
+        }
+        .btn-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        /* Animasi Pop-up Lencana */
+        @keyframes badgePop {
+            0% { transform: scale(0.3) rotate(-15deg); opacity: 0; }
+            70% { transform: scale(1.1) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .badge-reveal {
+            animation: badgePop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Kanvas Konfeti di Lapisan Atas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="text-slate-800 relative flex flex-col justify-between">
+
+    <!-- Kanvas untuk Animasi Bintang & Konfeti -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Hiasan Latar Belakang Kartun (Awan & Bintang) -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 opacity-60">
+        <!-- Awan Kiri -->
+        <svg class="w-32 h-20 text-white absolute top-10 left-6 animate-float" viewBox="0 0 100 60" fill="currentColor">
+            <path d="M25,50 Q10,50 10,35 Q10,22 23,20 Q28,5 45,5 Q62,5 68,18 Q85,18 88,33 Q90,50 72,50 Z"/>
+        </svg>
+        <!-- Awan Kanan -->
+        <svg class="w-40 h-24 text-white absolute top-20 right-10 animate-float-delayed" viewBox="0 0 100 60" fill="currentColor">
+            <path d="M25,50 Q10,50 10,35 Q10,22 23,20 Q28,5 45,5 Q62,5 68,18 Q85,18 88,33 Q90,50 72,50 Z"/>
+        </svg>
+        <!-- Bintang Hiasan -->
+        <svg class="w-8 h-8 text-yellow-400 absolute bottom-24 left-12 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <svg class="w-10 h-10 text-pink-300 absolute top-1/2 right-8 animate-bounce" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+    </div>
+
+    <!-- BAR NAVIGASI & KAWALAN AUDIO ATAS -->
+    <header class="relative z-10 w-full max-w-6xl mx-auto px-4 pt-4 pb-2 flex flex-wrap items-center justify-between gap-3">
+        <!-- Tag Subjek -->
+        <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border-2 border-sky-200">
+            <span class="text-2xl">🚌</span>
+            <div>
+                <p class="text-xs font-extrabold uppercase tracking-wider text-sky-600">Pendidikan Islam Tahun 5</p>
+                <p class="text-sm font-bold text-slate-700">Adab Menaiki Kenderaan</p>
+            </div>
+        </div>
+
+        <!-- Kawalan Muzik & Kesan Bunyi -->
+        <div class="flex items-center gap-2">
+            <button id="btn-toggle-music" onclick="toggleBackgroundMusic()" class="btn-3d flex items-center gap-2 bg-amber-300 hover:bg-amber-400 text-amber-950 font-bold px-4 py-2.5 rounded-full border-2 border-amber-500 text-sm cursor-pointer" title="Main atau Hentikan Muzik Latar">
+                <span id="music-icon" class="text-lg">🎵</span>
+                <span id="music-label">Muzik: Tutup</span>
+            </button>
+
+            <button id="btn-toggle-sfx" onclick="toggleSFX()" class="btn-3d flex items-center gap-2 bg-emerald-200 hover:bg-emerald-300 text-emerald-950 font-bold px-4 py-2.5 rounded-full border-2 border-emerald-400 text-sm cursor-pointer" title="Main atau Hentikan Kesan Bunyi">
+                <span id="sfx-icon" class="text-lg">🔊</span>
+                <span id="sfx-label">Bunyi: Hidup</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- KANDUNGAN UTAMA -->
+    <main class="relative z-10 w-full max-w-6xl mx-auto px-4 py-3 flex-grow flex flex-col justify-center">
+        
+        <!-- TAJUK UTAMA -->
+        <div class="text-center mb-5">
+            <div class="inline-block bg-white/95 px-6 py-3 rounded-3xl shadow-md border-4 border-sky-300">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-sky-700 tracking-wide drop-shadow-sm">
+                    ✨ IKRAR MUSAFIR CILIK ✨
+                </h1>
+                <div class="mt-1 inline-block bg-pink-100 text-pink-700 font-extrabold px-4 py-1 rounded-full text-base sm:text-lg border border-pink-300">
+                    BAHAGIAN 1: IKRAR KENDIRI – SAYA MUSAFIR BERADAB!
+                </div>
+            </div>
+        </div>
+
+        <!-- GRID UTAMA: ILUSTRASI KARTUN (KIRI) & PAPARAN IKRAR (KANAN) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            
+            <!-- PANEL KIRI: ILUSTRASI KARTUN 2D KANAK-KANAK MUSLIM BERIKRAR -->
+            <div class="lg:col-span-5 flex flex-col items-center">
+                <div class="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-5 shadow-xl border-4 border-emerald-300 relative overflow-hidden">
+                    <!-- Latar Belakang Ilustrasi -->
+                    <div class="bg-gradient-to-b from-sky-100 to-emerald-100 rounded-2xl p-4 flex flex-col items-center justify-center relative border-2 border-sky-200">
+                        
+                        <!-- SVG Kartun 2D Comel: Murid Lelaki & Perempuan Bertudung Mengangkat Tangan Berikrar -->
+                        <svg viewBox="0 0 360 280" class="w-full max-w-[330px] h-auto drop-shadow-md">
+                            <!-- Awan kecil dalam bingkai -->
+                            <circle cx="55" cy="45" r="16" fill="#FFFFFF" opacity="0.8"/>
+                            <circle cx="72" cy="45" r="20" fill="#FFFFFF" opacity="0.8"/>
+                            <circle cx="90" cy="48" r="14" fill="#FFFFFF" opacity="0.8"/>
+
+                            <!-- Jalan Raya & Kereta Comel di Latar Belakang -->
+                            <path d="M10 250 Q180 230 350 250 L350 275 L10 275 Z" fill="#94A3B8"/>
+                            <line x1="30" y1="262" x2="70" y2="260" stroke="#FEF08A" stroke-width="4" stroke-linecap="round"/>
+                            <line x1="160" y1="255" x2="200" y2="255" stroke="#FEF08A" stroke-width="4" stroke-linecap="round"/>
+                            <line x1="290" y1="260" x2="330" y2="262" stroke="#FEF08A" stroke-width="4" stroke-linecap="round"/>
+
+                            <!-- ================= WATAK 1: KANAK-KANAK LELAKI MUSLIM (KIRI) ================= -->
+                            <g transform="translate(35, 35)">
+                                <!-- Badan / Baju Melayu Pastel Biru -->
+                                <path d="M35 125 C35 105, 105 105, 105 125 L112 205 L28 205 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="3"/>
+                                <!-- Kolar Baju Melayu -->
+                                <path d="M60 112 L70 132 L80 112" fill="none" stroke="#0284C7" stroke-width="3" stroke-linecap="round"/>
+                                <circle cx="70" cy="124" r="2.5" fill="#FDE047"/>
+                                <circle cx="70" cy="134" r="2.5" fill="#FDE047"/>
+                                <!-- Sampin Hijau Mint -->
+                                <rect x="31" y="168" width="78" height="37" rx="4" fill="#34D399" stroke="#059669" stroke-width="3"/>
+                                <line x1="31" y1="178" x2="109" y2="178" stroke="#FDE047" stroke-width="2" stroke-dasharray="6,4"/>
+
+                                <!-- Tangan Kiri di Sisi -->
+                                <path d="M35 125 Q18 155 26 180" fill="none" stroke="#38BDF8" stroke-width="14" stroke-linecap="round"/>
+                                <circle cx="26" cy="182" r="8" fill="#FDBA74" stroke="#EA580C" stroke-width="2"/>
+
+                                <!-- Tangan Kanan Mengangkat Ikrar (Tangan di dada / angkat ikrar) -->
+                                <path d="M102 125 Q128 110 124 82" fill="none" stroke="#38BDF8" stroke-width="14" stroke-linecap="round"/>
+                                <!-- Tapak Tangan Mengangkat Ikrar -->
+                                <g transform="translate(114, 64)">
+                                    <rect x="2" y="8" width="18" height="18" rx="6" fill="#FDBA74" stroke="#EA580C" stroke-width="2"/>
+                                    <line x1="5" y1="8" x2="5" y2="1" stroke="#EA580C" stroke-width="3" stroke-linecap="round"/>
+                                    <line x1="9" y1="8" x2="9" y2="0" stroke="#EA580C" stroke-width="3" stroke-linecap="round"/>
+                                    <line x1="13" y1="8" x2="13" y2="1" stroke="#EA580C" stroke-width="3" stroke-linecap="round"/>
+                                    <line x1="17" y1="8" x2="17" y2="3" stroke="#EA580C" stroke-width="3" stroke-linecap="round"/>
+                                </g>
+
+                                <!-- Leher & Kepala -->
+                                <rect x="61" y="96" width="18" height="16" rx="6" fill="#FDBA74"/>
+                                <!-- Telinga -->
+                                <circle cx="34" cy="70" r="8" fill="#FDBA74" stroke="#EA580C" stroke-width="2"/>
+                                <circle cx="106" cy="70" r="8" fill="#FDBA74" stroke="#EA580C" stroke-width="2"/>
+                                <!-- Muka Bulat Comel -->
+                                <circle cx="70" cy="68" r="36" fill="#FED7AA" stroke="#EA580C" stroke-width="2.5"/>
+                                
+                                <!-- Songkok Hitam Comel -->
+                                <path d="M35 50 Q70 42 105 50 L100 22 Q70 16 40 22 Z" fill="#1E293B" stroke="#0F172A" stroke-width="2.5"/>
+                                <path d="M38 44 Q70 38 102 44" fill="none" stroke="#38BDF8" stroke-width="2"/>
+
+                                <!-- Mata Ceria & Senyuman -->
+                                <circle cx="57" cy="66" r="4.5" fill="#1E293B"/>
+                                <circle cx="58.5" cy="64.5" r="1.5" fill="#FFFFFF"/>
+                                <circle cx="83" cy="66" r="4.5" fill="#1E293B"/>
+                                <circle cx="84.5" cy="64.5" r="1.5" fill="#FFFFFF"/>
+                                <!-- Kening -->
+                                <path d="M51 57 Q57 54 63 57" fill="none" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round"/>
+                                <path d="M77 57 Q83 54 89 57" fill="none" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round"/>
+                                <!-- Pipi Merah Jambu -->
+                                <ellipse cx="48" cy="76" rx="6" ry="3.5" fill="#FDA4AF" opacity="0.7"/>
+                                <ellipse cx="92" cy="76" rx="6" ry="3.5" fill="#FDA4AF" opacity="0.7"/>
+                                <!-- Senyuman Lebar -->
+                                <path d="M58 80 Q70 93 82 80 Z" fill="#F43F5E" stroke="#9F1239" stroke-width="2"/>
+                            </g>
+
+                            <!-- ================= WATAK 2: KANAK-KANAK PEREMPUAN BERTUDUNG (KANAN) ================= -->
+                            <g transform="translate(185, 38)">
+                                <!-- Badan / Baju Kurung Pastel Merah Jambu -->
+                                <path d="M35 125 C35 105, 105 105, 105 125 L114 202 L26 202 Z" fill="#F472B6" stroke="#DB2777" stroke-width="3"/>
+                                <!-- Kain Baju Kurung Kuning Lembut -->
+                                <rect x="30" y="168" width="80" height="34" rx="4" fill="#FDE047" stroke="#CA8A04" stroke-width="3"/>
+
+                                <!-- Tangan Kanan di Sisi -->
+                                <path d="M105 125 Q122 155 114 180" fill="none" stroke="#F472B6" stroke-width="14" stroke-linecap="round"/>
+                                <circle cx="114" cy="182" r="8" fill="#FDBA74" stroke="#EA580C" stroke-width="2"/>
+
+                                <!-- Tangan Kiri Mengangkat Ikrar -->
+                                <path d="M38 125 Q12 110 16 82" fill="none" stroke="#F472B6" stroke-width="14" stroke-linecap="round"/>
+                                <!-- Tapak Tangan Mengangkat Ikrar -->
+                                <g transform="translate(4, 64)">
+                                    <rect x="2" y="8" width="18" height="18" rx="6" fill="#FDBA74" stroke="#EA580C" stroke-width="2"/>
+                                    <line x1="5" y1="8" x2="5" y2="3" stroke="#EA580C" stroke-width="3" stroke-linecap="round"/>
+                                    <line x1="9" y1="8" x2="9" y2="1" stroke="#EA580C" stroke-width="3" stroke-linecap="round"/>
+                                    <line x1="13" y1="8" x2="13" y2="0" stroke="#EA580C" stroke-width="3" stroke-linecap="round"/>
+                                    <line x1="17" y1="8" x2="17" y2="1" stroke="#EA580C" stroke-width="3" stroke-linecap="round"/>
+                                </g>
+
+                                <!-- Tudung Labuh Comel Warna Pastel Kuning/Krim -->
+                                <path d="M25 65 C25 22, 115 22, 115 65 C120 105, 112 142, 70 148 C28 142, 20 105, 25 65 Z" fill="#FEF08A" stroke="#EAB308" stroke-width="3"/>
+                                <!-- Muka Bulat Comel -->
+                                <circle cx="70" cy="68" r="33" fill="#FED7AA" stroke="#EA580C" stroke-width="2"/>
+                                <!-- Awning Tudung -->
+                                <path d="M37 64 Q70 30 103 64" fill="none" stroke="#EAB308" stroke-width="3.5" stroke-linecap="round"/>
+                                <!-- Pin Tudung Reben Comel -->
+                                <circle cx="70" cy="108" r="5" fill="#F43F5E"/>
+                                <path d="M62 104 L70 108 L62 112 Z" fill="#FB7185"/>
+                                <path d="M78 104 L70 108 L78 112 Z" fill="#FB7185"/>
+
+                                <!-- Mata Ceria & Senyuman -->
+                                <circle cx="58" cy="66" r="4.5" fill="#1E293B"/>
+                                <circle cx="59.5" cy="64.5" r="1.5" fill="#FFFFFF"/>
+                                <circle cx="82" cy="66" r="4.5" fill="#1E293B"/>
+                                <circle cx="83.5" cy="64.5" r="1.5" fill="#FFFFFF"/>
+                                <!-- Bulu Mata Comel -->
+                                <line x1="53" y1="63" x2="50" y2="61" stroke="#1E293B" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="87" y1="63" x2="90" y2="61" stroke="#1E293B" stroke-width="2" stroke-linecap="round"/>
+                                <!-- Pipi Merah Jambu -->
+                                <ellipse cx="49" cy="76" rx="6" ry="3.5" fill="#FDA4AF" opacity="0.8"/>
+                                <ellipse cx="91" cy="76" rx="6" ry="3.5" fill="#FDA4AF" opacity="0.8"/>
+                                <!-- Senyuman Manis -->
+                                <path d="M59 80 Q70 91 81 80 Z" fill="#F43F5E" stroke="#9F1239" stroke-width="2"/>
+                            </g>
+
+                            <!-- Bintang-Bintang Semangat di Atas Kepala -->
+                            <polygon points="180,18 184,28 195,29 187,36 189,47 180,41 171,47 173,36 165,29 176,28" fill="#FACC15" stroke="#EAB308" stroke-width="1.5"/>
+                        </svg>
+
+                        <!-- Kapsyen Galakan Bawah Ilustrasi -->
+                        <div class="mt-2 bg-white/90 px-4 py-2 rounded-2xl border-2 border-emerald-200 text-center shadow-sm">
+                            <p class="text-sm sm:text-base font-extrabold text-emerald-800">
+                                ✋ Angkat tangan kanan & lafazkan ikrar dengan penuh semangat!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- BUTANG KAWALAN AUDIO IKRAR -->
+                    <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+                        <button id="btn-listen" onclick="playPledgeAudio()" class="btn-3d flex-1 min-w-[160px] flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-display font-bold text-lg px-5 py-3.5 rounded-2xl border-2 border-sky-700 cursor-pointer">
+                            <span class="text-2xl">🗣️</span>
+                            <span>DENGAR IKRAR</span>
+                        </button>
+
+                        <button id="btn-replay" onclick="replayPledgeAudio()" class="btn-3d flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-950 font-display font-bold text-base px-4 py-3.5 rounded-2xl border-2 border-amber-600 cursor-pointer" title="Ulang Semula Audio Ikrar">
+                            <span class="text-xl">🔄</span>
+                            <span>ULANG</span>
+                        </button>
+                    </div>
+                    <!-- Petunjuk Status Audio -->
+                    <p id="audio-status" class="text-center text-xs font-bold text-slate-500 mt-2 h-4">
+                        Tekan "DENGAR IKRAR" untuk mendengar bacaan.
+                    </p>
+                </div>
+            </div>
+
+            <!-- PANEL KANAN: TEKS IKRAR & BUTANG SAYA BERJANJI -->
+            <div class="lg:col-span-7 flex flex-col">
+                <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-6 sm:p-7 shadow-xl border-4 border-amber-300 relative">
+                    
+                    <!-- Tajuk Kad Ikrar -->
+                    <div class="flex items-center justify-between border-b-2 border-amber-200 pb-3 mb-4">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-3xl">📜</span>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-amber-800">Lafaz Ikrar Saya</h2>
+                        </div>
+                        <span class="bg-sky-100 text-sky-800 text-xs sm:text-sm font-extrabold px-3 py-1 rounded-full border border-sky-300">
+                            Baca dengan jelas
+                        </span>
+                    </div>
+
+                    <!-- Teks Ikrar Utama (Tepat seperti yang diminta) -->
+                    <div id="pledge-container" class="space-y-2.5 text-lg sm:text-xl md:text-[22px] font-bold text-slate-800 leading-relaxed">
+                        <p id="line-0" class="pledge-line text-sky-800 font-extrabold">
+                            “Saya berjanji akan:
+                        </p>
+                        
+                        <div id="line-1" class="pledge-line flex items-start gap-3">
+                            <span class="bg-sky-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-base font-extrabold shrink-0 mt-0.5 shadow-sm">1</span>
+                            <span>Membaca <span class="text-emerald-700">Bismillah</span> sebelum menaiki kenderaan.</span>
+                        </div>
+
+                        <div id="line-2" class="pledge-line flex items-start gap-3">
+                            <span class="bg-emerald-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-base font-extrabold shrink-0 mt-0.5 shadow-sm">2</span>
+                            <span>Membaca <span class="text-sky-700">doa menaiki kenderaan</span>.</span>
+                        </div>
+
+                        <div id="line-3" class="pledge-line flex items-start gap-3">
+                            <span class="bg-amber-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-base font-extrabold shrink-0 mt-0.5 shadow-sm">3</span>
+                            <span>Menjaga <span class="text-amber-700">keselamatan diri</span>.</span>
+                        </div>
+
+                        <div id="line-4" class="pledge-line flex items-start gap-3">
+                            <span class="bg-pink-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-base font-extrabold shrink-0 mt-0.5 shadow-sm">4</span>
+                            <span>Menjaga <span class="text-pink-700">kebersihan kenderaan</span>.</span>
+                        </div>
+
+                        <div id="line-5" class="pledge-line flex items-start gap-3">
+                            <span class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-base font-extrabold shrink-0 mt-0.5 shadow-sm">5</span>
+                            <span>Menghormati <span class="text-purple-700">orang lain</span>.</span>
+                        </div>
+
+                        <p id="line-6" class="pledge-line text-emerald-800 font-extrabold pt-1">
+                            Saya akan mengamalkan adab menaiki kenderaan dalam kehidupan seharian.”
+                        </p>
+                    </div>
+
+                    <!-- BUTANG BESAR "SAYA BERJANJI!" -->
+                    <div class="mt-6 pt-4 border-t-2 border-dashed border-amber-200 flex flex-col items-center">
+                        <button id="btn-promise" onclick="celebratePromise()" class="btn-3d animate-pulse-soft w-full sm:w-auto min-w-[280px] bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-600 text-white font-display font-bold text-2xl sm:text-3xl px-8 py-4 rounded-3xl border-4 border-emerald-700 shadow-lg flex items-center justify-center gap-3 cursor-pointer">
+                            <span class="text-3xl">🌟</span>
+                            <span>SAYA BERJANJI!</span>
+                            <span class="text-3xl">✋</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL / PAPARAN PENGHARGAAN SELEPAS MENEKAN "SAYA BERJANJI!" -->
+    <div id="reward-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center border-4 border-yellow-400 shadow-2xl relative badge-reveal">
+            
+            <!-- Lencana Penghargaan SVG -->
+            <div class="mx-auto w-44 h-44 mb-3 relative flex items-center justify-center">
+                <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-lg">
+                    <!-- Reben Bawah -->
+                    <path d="M65 135 L45 190 L75 175 L90 192 L95 140 Z" fill="#F43F5E" stroke="#BE123C" stroke-width="3"/>
+                    <path d="M135 135 L155 190 L125 175 L110 192 L105 140 Z" fill="#0EA5E9" stroke="#0369A1" stroke-width="3"/>
+                    
+                    <!-- Bentuk Bintang / Rosette Lencana -->
+                    <circle cx="100" cy="90" r="68" fill="#FACC15" stroke="#CA8A04" stroke-width="4"/>
+                    <circle cx="100" cy="90" r="56" fill="#FEF08A" stroke="#EAB308" stroke-width="2.5" stroke-dasharray="6,4"/>
+                    <circle cx="100" cy="90" r="46" fill="#10B981" stroke="#047857" stroke-width="3"/>
+                    
+                    <!-- Ikon Bintang & Hati di Tengah Lencana -->
+                    <polygon points="100,52 108,72 130,74 113,88 118,110 100,98 82,110 87,88 70,74 92,72" fill="#FDE047" stroke="#CA8A04" stroke-width="2"/>
+                </svg>
+            </div>
+
+            <!-- Gelaran Lencana -->
+            <div class="inline-block bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-amber-950 font-display font-bold text-xl sm:text-2xl px-6 py-2 rounded-full border-2 border-amber-600 shadow-md mb-4">
+                🏅 SAYA MUSAFIR BERADAB! 🏅
+            </div>
+
+            <!-- Mesej Tahniah Tepat -->
+            <h3 class="text-2xl sm:text-3xl font-display font-bold text-emerald-700 leading-snug mb-3">
+                “Alhamdulillah! Kamu berjanji untuk menjadi musafir yang beradab!”
+            </h3>
+
+            <p class="text-slate-600 font-bold text-base sm:text-lg mb-6">
+                Semoga Allah memberkati setiap perjalanan kamu. Teruskan mengamalkan adab menaiki kenderaan setiap hari!
+            </p>
+
+            <!-- Butang Tutup / Lafaz Semula -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <button onclick="triggerConfettiBurst()" class="btn-3d bg-yellow-400 hover:bg-yellow-500 text-yellow-950 font-display font-bold text-lg px-5 py-3 rounded-2xl border-2 border-yellow-600 cursor-pointer">
+                    ✨ Lagi Bintang!
+                </button>
+                <button onclick="closeRewardModal()" class="btn-3d bg-sky-500 hover:bg-sky-600 text-white font-display font-bold text-lg px-6 py-3 rounded-2xl border-2 border-sky-700 cursor-pointer">
+                    👍 Selesai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER RINGKAS -->
+    <footer class="relative z-10 text-center py-3 px-4 text-xs sm:text-sm font-bold text-slate-600">
+        Bahan Pembelajaran Digital Interaktif • Pendidikan Islam Tahun 5 (Adab Menaiki Kenderaan)
+    </footer>
+
+    <!-- SKRIP INTERAKTIF, AUDIO & ANIMASI -->
+    <script>
+        // ==========================================
+        // 1. PENGURUSAN AUDIO (TONE.JS & SPEECH API)
+        // ==========================================
+        let sfxEnabled = true;
+        let bgMusicPlaying = false;
+        let bgLoop = null;
+        let bgSynth = null;
+        let isSpeaking = false;
+        let highlightTimers = [];
+
+        // Teks ikrar mengikut baris untuk diselaraskan dengan bacaan audio
+        const pledgeLines = [
+            "Saya berjanji akan:",
+            "1. Membaca Bismillah sebelum menaiki kenderaan.",
+            "2. Membaca doa menaiki kenderaan.",
+            "3. Menjaga keselamatan diri.",
+            "4. Menjaga kebersihan kenderaan.",
+            "5. Menghormati orang lain.",
+            "Saya akan mengamalkan adab menaiki kenderaan dalam kehidupan seharian."
+        ];
+
+        // Kesan Bunyi Apabila Butang Ditekan (Tone.js)
+        function playClickSound(type = 'pop') {
+            if (!sfxEnabled) return;
+            try {
+                if (Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+                const synth = new Tone.Synth({
+                    oscillator: { type: 'sine' },
+                    envelope: { attack: 0.01, decay: 0.12, sustain: 0, release: 0.1 }
+                }).toDestination();
+                synth.volume.value = -8;
+
+                if (type === 'pop') {
+                    synth.triggerAttackRelease("C5", "16n");
+                } else if (type === 'chime') {
+                    // Bunyi ceria kemenangan/penghargaan
+                    const now = Tone.now();
+                    synth.triggerAttackRelease("C5", "16n", now);
+                    synth.triggerAttackRelease("E5", "16n", now + 0.1);
+                    synth.triggerAttackRelease("G5", "16n", now + 0.2);
+                    synth.triggerAttackRelease("C6", "8n", now + 0.3);
+                }
+            } catch (e) {
+                console.warn("Audio SFX tidak dapat dimainkan:", e);
+            }
+        }
+
+        // Hidup/Matikan Kesan Bunyi
+        function toggleSFX() {
+            sfxEnabled = !sfxEnabled;
+            const icon = document.getElementById('sfx-icon');
+            const label = document.getElementById('sfx-label');
+            const btn = document.getElementById('btn-toggle-sfx');
+
+            if (sfxEnabled) {
+                icon.textContent = '🔊';
+                label.textContent = 'Bunyi: Hidup';
+                btn.classList.remove('bg-slate-200', 'text-slate-600', 'border-slate-400');
+                btn.classList.add('bg-emerald-200', 'text-emerald-950', 'border-emerald-400');
+                playClickSound('pop');
+            } else {
+                icon.textContent = '🔇';
+                label.textContent = 'Bunyi: Tutup';
+                btn.classList.remove('bg-emerald-200', 'text-emerald-950', 'border-emerald-400');
+                btn.classList.add('bg-slate-200', 'text-slate-600', 'border-slate-400');
+            }
+        }
+
+        // Muzik Latar Lembut & Ceria (Melodi Marimba/Kalimba Pastel)
+        async function toggleBackgroundMusic() {
+            playClickSound('pop');
+            const icon = document.getElementById('music-icon');
+            const label = document.getElementById('music-label');
+            const btn = document.getElementById('btn-toggle-music');
+
+            if (!bgMusicPlaying) {
+                await Tone.start();
+                if (!bgSynth) {
+                    bgSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: 'triangle' },
+                        envelope: { attack: 0.05, decay: 0.3, sustain: 0.2, release: 0.8 }
+                    }).toDestination();
+                    bgSynth.volume.value = -20; // Perlahan supaya suara bacaan jelas
+
+                    const notes = [
+                        "C4", "E4", "G4", "A4",
+                        "G4", "E4", "D4", "G4",
+                        "C4", "E4", "G4", "B4",
+                        "A4", "G4", "E4", "C4"
+                    ];
+                    let step = 0;
+
+                    bgLoop = new Tone.Loop((time) => {
+                        bgSynth.triggerAttackRelease(notes[step % notes.length], "8n", time);
+                        step++;
+                    }, "4n");
+                }
+
+                Tone.Transport.bpm.value = 105;
+                Tone.Transport.start();
+                bgLoop.start(0);
+                bgMusicPlaying = true;
+
+                icon.textContent = '🎶';
+                label.textContent = 'Muzik: Hidup';
+                btn.classList.remove('bg-amber-300');
+                btn.classList.add('bg-pink-300', 'border-pink-500', 'text-pink-950');
+            } else {
+                if (bgLoop) bgLoop.stop();
+                Tone.Transport.stop();
+                bgMusicPlaying = false;
+
+                icon.textContent = '🎵';
+                label.textContent = 'Muzik: Tutup';
+                btn.classList.remove('bg-pink-300', 'border-pink-500', 'text-pink-950');
+                btn.classList.add('bg-amber-300');
+            }
+        }
+
+        // ==========================================
+        // 2. BACAAN SUARA IKRAR (WEB SPEECH API)
+        // ==========================================
+        function clearHighlights() {
+            highlightTimers.forEach(t => clearTimeout(t));
+            highlightTimers = [];
+            for (let i = 0; i <= 6; i++) {
+                const el = document.getElementById(`line-${i}`);
+                if (el) el.classList.remove('active-reading');
+            }
+        }
+
+        function highlightLine(index) {
+            for (let i = 0; i <= 6; i++) {
+                const el = document.getElementById(`line-${i}`);
+                if (el) {
+                    if (i === index) {
+                        el.classList.add('active-reading');
+                    } else {
+                        el.classList.remove('active-reading');
+                    }
+                }
+            }
+        }
+
+        // Mainkan Audio Ikrar dengan Suara Ceria & Sorotan Baris
+        function playPledgeAudio() {
+            playClickSound('pop');
+            const statusEl = document.getElementById('audio-status');
+            const btnListen = document.getElementById('btn-listen');
+
+            // Hentikan bacaan sedia ada jika ada
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            clearHighlights();
+
+            if (!('speechSynthesis' in window)) {
+                statusEl.textContent = "Pelayar ini tidak menyokong suara. Sila baca bersama-sama!";
+                simulateReadingHighlight();
+                return;
+            }
+
+            isSpeaking = true;
+            statusEl.textContent = "🔊 Sedang membacakan ikrar... Mari ikut bersama!";
+            btnListen.classList.add('ring-4', 'ring-sky-300');
+
+            // Baca baris demi baris supaya sorotan teks 100% tepat
+            let currentLine = 0;
+
+            function speakNextLine() {
+                if (currentLine >= pledgeLines.length || !isSpeaking) {
+                    finishReading();
+                    return;
+                }
+
+                highlightLine(currentLine);
+
+                // Bersihkan nombor untuk bacaan semula jadi
+                const cleanText = pledgeLines[currentLine].replace(/^\d+\.\s*/, '');
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                
+                // Cuba pilih suara Bahasa Melayu / Indonesia yang mesra
+                const voices = window.speechSynthesis.getVoices();
+                const msVoice = voices.find(v => v.lang.includes('ms') || v.lang.includes('id'));
+                if (msVoice) {
+                    utterance.voice = msVoice;
+                }
+                utterance.lang = 'ms-MY';
+                // Laraskan nada lebih tinggi sedikit untuk menyerupai suara kanak-kanak yang ceria
+                utterance.pitch = 1.35; 
+                utterance.rate = 0.92;
+
+                utterance.onend = () => {
+                    currentLine++;
+                    setTimeout(speakNextLine, 250);
+                };
+
+                utterance.onerror = () => {
+                    // Sandaran jika suara gagal pada peranti tertentu
+                    currentLine++;
+                    setTimeout(speakNextLine, 1200);
+                };
+
+                window.speechSynthesis.speak(utterance);
+            }
+
+            speakNextLine();
+        }
+
+        function finishReading() {
+            isSpeaking = false;
+            clearHighlights();
+            const statusEl = document.getElementById('audio-status');
+            const btnListen = document.getElementById('btn-listen');
+            statusEl.textContent = "✅ Bacaan tamat! Tekan 'SAYA BERJANJI!' di sebelah kanan.";
+            btnListen.classList.remove('ring-4', 'ring-sky-300');
+        }
+
+        // Ulang Semula Audio Ikrar
+        function replayPledgeAudio() {
+            playPledgeAudio();
+        }
+
+        // Sandaran sorotan jika SpeechSynthesis tiada
+        function simulateReadingHighlight() {
+            pledgeLines.forEach((_, idx) => {
+                const timer = setTimeout(() => {
+                    highlightLine(idx);
+                    if (idx === pledgeLines.length - 1) {
+                        setTimeout(finishReading, 2000);
+                    }
+                }, idx * 1800);
+                highlightTimers.push(timer);
+            });
+        }
+
+        // ==========================================
+        // 3. SAMBUTAN "SAYA BERJANJI!" & KONFETI
+        // ==========================================
+        function celebratePromise() {
+            // Hentikan bacaan jika sedang berjalan
+            isSpeaking = false;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            clearHighlights();
+
+            // Mainkan bunyi ceria
+            playClickSound('chime');
+
+            // Paparkan modal lencana penghargaan
+            const modal = document.getElementById('reward-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Lancarkan animasi bintang & konfeti
+            triggerConfettiBurst();
+
+            // Bacakan mesej tahniah secara ringkas jika suara disokong
+            if ('speechSynthesis' in window) {
+                const congratsUtterance = new SpeechSynthesisUtterance("Alhamdulillah! Kamu berjanji untuk menjadi musafir yang beradab!");
+                const voices = window.speechSynthesis.getVoices();
+                const msVoice = voices.find(v => v.lang.includes('ms') || v.lang.includes('id'));
+                if (msVoice) congratsUtterance.voice = msVoice;
+                congratsUtterance.lang = 'ms-MY';
+                congratsUtterance.pitch = 1.3;
+                congratsUtterance.rate = 0.95;
+                window.speechSynthesis.speak(congratsUtterance);
+            }
+        }
+
+        function closeRewardModal() {
+            playClickSound('pop');
+            const modal = document.getElementById('reward-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // ==========================================
+        // 4. KANVAS ANIMASI BINTANG & KONFETI
+        // ==========================================
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const pastelColors = ['#FACC15', '#38BDF8', '#34D399', '#F472B6', '#A78BFA', '#FB923C'];
+
+        function createParticles(count = 90) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: canvas.width / 2 + (Math.random() - 0.5) * 300,
+                    y: canvas.height / 2 + (Math.random() - 0.5) * 150,
+                    vx: (Math.random() - 0.5) * 16,
+                    vy: (Math.random() - 1) * 16 - 4,
+                    size: Math.random() * 10 + 6,
+                    color: pastelColors[Math.floor(Math.random() * pastelColors.length)],
+                    isStar: Math.random() > 0.4,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10,
+                    gravity: 0.35,
+                    alpha: 1
+                });
+            }
+        }
+
+        function drawStar(cx, cy, spikes, outerRadius, innerRadius, color, alpha, rotation) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate((rotation * Math.PI) / 180);
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            let rot = (Math.PI / 2) * 3;
+            let x = 0;
+            let y = 0;
+            const step = Math.PI / spikes;
+
+            ctx.moveTo(0, -outerRadius);
+            for (let i = 0; i < spikes; i++) {
+                x = Math.cos(rot) * outerRadius;
+                y = Math.sin(rot) * outerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+
+                x = Math.cos(rot) * innerRadius;
+                y = Math.sin(rot) * innerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+            }
+            ctx.lineTo(0, -outerRadius);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function updateAndDrawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.rotation += p.rotationSpeed;
+                p.alpha -= 0.008;
+
+                if (p.alpha <= 0 || p.y > canvas.height + 30) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                if (p.isStar) {
+                    drawStar(p.x, p.y, 5, p.size, p.size / 2, p.color, p.alpha, p.rotation);
+                } else {
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.globalAlpha = p.alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+                    ctx.restore();
+                }
+            }
+
+            if (particles.length > 0) {
+                animationFrameId = requestAnimationFrame(updateAndDrawParticles);
+            } else {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        }
+
+        function triggerConfettiBurst() {
+            createParticles(100);
+            if (!animationFrameId) {
+                updateAndDrawParticles();
+            }
+        }
+
+        // Muat senarai suara lebih awal supaya sedia apabila murid menekan butang
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
+        }
+    </script>
+</body>
+</html>
